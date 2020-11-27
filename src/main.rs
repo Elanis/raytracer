@@ -1,27 +1,46 @@
-mod vec3;
+mod classes;
 
 use std::io::Write;
-use vec3::Vec3;
+use classes::vec3::Vec3;
+use classes::ray::Ray;
 
 use std::fs::File;
+
+fn color_from_ray(r: Ray) -> Vec3 {
+	let unit_direction = r.direction();
+	let t = 0.5 * (unit_direction.y + 1.0);
+
+	(1.0 -t)*Vec3::new(1.0, 1.0, 1.0) + t*Vec3::new(0.5, 0.7, 1.0)
+}
 
 fn main() -> std::io::Result<()> {
 	let nx = 200;
 	let ny = 100;
 
+	// File header
 	let mut file = File::create("test.ppm")?;
-
 	file.write(b"P3\n")?;
 	file.write((nx.to_string() + &" ".to_owned() + &ny.to_string()+ &"\n".to_owned()).as_bytes())?;
 	file.write(b"255\n")?;
 
+	// Preparate variables
+	let lower_left_corner = Vec3::new(-2.0, -1.0, -1.0);
+	let horizontal        = Vec3::new( 4.0,  0.0,  0.0);
+	let vertical          = Vec3::new( 0.0,  2.0,  0.0);
+	let origin            = Vec3::new( 0.0,  0.0,  0.0);
+
+	// File content
 	for j in (0..ny).rev() {
 		for i in 0..nx {
-			let col = Vec3::new(i as f32 / nx as f32, j as f32 / ny as f32, 0.2 as f32);
+			let u = i as f32 / nx as f32;
+			let v = j as f32 / ny as f32;
 
-			let ir = (255.99*col.x).round();
-			let ig = (255.99*col.y).round();
-			let ib = (255.99*col.z).round();
+			let r = Ray::new(origin, lower_left_corner + u*horizontal + v*vertical);
+			let col = color_from_ray(r);
+
+			let ir = (255.0*col.x).round();
+			let ig = (255.0*col.y).round();
+			let ib = (255.0*col.z).round();
 
 			file.write((ir.to_string() + &" ".to_owned() + &ig.to_string() + &" ".to_owned() + &ib.to_string() + &"\n".to_owned()).as_bytes())?;
 		}
