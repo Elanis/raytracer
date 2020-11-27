@@ -6,7 +6,21 @@ use classes::ray::Ray;
 
 use std::fs::File;
 
-fn color_from_ray(r: Ray) -> Vec3 {
+fn hit_sphere(center: Vec3, radius: f32, r: &Ray) -> bool {
+	let oc = r.origin() - &center;
+
+	let a = Vec3::dot_product(&r.direction(), &r.direction());
+	let b = 2.0 * Vec3::dot_product(&oc, &r.direction());
+	let c = Vec3::dot_product(&oc, &oc) - radius * radius;
+
+	(b*b - 4.0*a*c) > 0.0
+}
+
+fn color_from_ray(r: &Ray) -> Vec3 {
+	if hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, r) {
+		return Vec3::new(1.0,0.0,0.0)
+	}
+
 	let unit_direction = r.direction();
 	let t = 0.5 * (unit_direction.y + 1.0);
 
@@ -36,7 +50,7 @@ fn main() -> std::io::Result<()> {
 			let v = j as f32 / ny as f32;
 
 			let r = Ray::new(origin, lower_left_corner + u*horizontal + v*vertical);
-			let col = color_from_ray(r);
+			let col = color_from_ray(&r);
 
 			let ir = (255.0*col.x).round();
 			let ig = (255.0*col.y).round();
