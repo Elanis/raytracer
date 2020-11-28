@@ -14,10 +14,27 @@ use std::fs::File;
 
 use rand::Rng;
 
+fn random_in_unit_sphere() -> Vec3 {
+	let mut p;
+	let mut rng = rand::thread_rng();
+
+	loop {
+		p = Vec3::new(rng.gen_range(-1.0, 1.0), rng.gen_range(-1.0, 1.0), rng.gen_range(-1.0, 1.0));
+
+		if p.squared_length() < 1.0 {
+			break;
+		}
+	}
+
+	p
+}
+
 fn color_from_ray(r: &Ray, world: Box<&dyn Hitable>) -> Vec3 {
 	let mut rec = HitRecord::new();
-	if world.hit(r, 0.0, std::f32::MAX, &mut rec) {
-		return 0.5 * Vec3::new(rec.normal.x + 1.0, rec.normal.y + 1.0, rec.normal.z + 1.0);
+	if world.hit(r, 0.001, std::f32::MAX, &mut rec) {
+		let target = rec.p + rec.normal + random_in_unit_sphere();
+
+		return 0.5 * color_from_ray(&Ray::new(rec.p, target - &rec.p), world);
 	}
 
 	let unit_direction = r.direction();
@@ -60,9 +77,9 @@ fn main() -> std::io::Result<()> {
 				color = color + col;
 			}
 
-			let ir = (255.0*color.x/ns as f32).round();
-			let ig = (255.0*color.y/ns as f32).round();
-			let ib = (255.0*color.z/ns as f32).round();
+			let ir = (255.0*(color.x/ns as f32).sqrt()).round();
+			let ig = (255.0*(color.y/ns as f32).sqrt()).round();
+			let ib = (255.0*(color.z/ns as f32).sqrt()).round();
 
 			file.write((ir.to_string() + &" ".to_owned() + &ig.to_string() + &" ".to_owned() + &ib.to_string() + &"\n".to_owned()).as_bytes())?;
 		}
