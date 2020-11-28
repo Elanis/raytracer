@@ -12,6 +12,8 @@ use classes::vec3::Vec3;
 
 use std::fs::File;
 
+use rand::Rng;
+
 fn color_from_ray(r: &Ray, world: Box<&dyn Hitable>) -> Vec3 {
 	let mut rec = HitRecord::new();
 	if world.hit(r, 0.0, std::f32::MAX, &mut rec) {
@@ -27,6 +29,7 @@ fn color_from_ray(r: &Ray, world: Box<&dyn Hitable>) -> Vec3 {
 fn main() -> std::io::Result<()> {
 	let nx = 200;
 	let ny = 100;
+	let ns = 100;
 
 	// File header
 	let mut file = File::create("test.ppm")?;
@@ -35,6 +38,7 @@ fn main() -> std::io::Result<()> {
 	file.write(b"255\n")?;
 
 	// Preparate variables
+	let mut rng = rand::thread_rng();
 	let camera = Camera::new();
 
 	let mut word = HitableList::new();
@@ -44,15 +48,21 @@ fn main() -> std::io::Result<()> {
 	// File content
 	for j in (0..ny).rev() {
 		for i in 0..nx {
-			let u = i as f32 / nx as f32;
-			let v = j as f32 / ny as f32;
+			let mut color = Vec3::new(0.0, 0.0, 0.0);
 
-			let r = camera.get_ray(u, v);
-			let col = color_from_ray(&r, Box::new(&word));
+			for _s in 0..ns {
+				let u = (i as f32 + rng.gen_range(0.0, 1.0))  / nx as f32;
+				let v = (j as f32 + rng.gen_range(0.0, 1.0))  / ny as f32;
 
-			let ir = (255.0*col.x).round();
-			let ig = (255.0*col.y).round();
-			let ib = (255.0*col.z).round();
+				let r = camera.get_ray(u, v);
+				let col = color_from_ray(&r, Box::new(&word));
+
+				color = color + col;
+			}
+
+			let ir = (255.0*color.x/ns as f32).round();
+			let ig = (255.0*color.y/ns as f32).round();
+			let ib = (255.0*color.z/ns as f32).round();
 
 			file.write((ir.to_string() + &" ".to_owned() + &ig.to_string() + &" ".to_owned() + &ib.to_string() + &"\n".to_owned()).as_bytes())?;
 		}
