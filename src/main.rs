@@ -3,6 +3,7 @@ mod classes;
 use std::io::Write;
 
 use classes::camera::Camera;
+use classes::dielectric::Dielectric;
 use classes::hitable::Hitable;
 use classes::hitableList::HitableList;
 use classes::hitRecord::HitRecord;
@@ -55,10 +56,10 @@ fn main() -> std::io::Result<()> {
 	let camera = Camera::new();
 
 	let mut word = HitableList::new();
-	word.push(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5, Box::new(Lambertian::new(Vec3::new(0.8, 0.3, 0.3))))));
+	word.push(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5, Box::new(Lambertian::new(Vec3::new(0.1, 0.2, 0.5))))));
 	word.push(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0))))));
 	word.push(Box::new(Sphere::new(Vec3::new(1.0, 0.0, -1.0), 0.5, Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.3)))));
-	word.push(Box::new(Sphere::new(Vec3::new(-1.0, 0.0, -1.0), 0.5, Box::new(Metal::new(Vec3::new(0.8, 0.8, 0.8), 1.0)))));
+	word.push(Box::new(Sphere::new(Vec3::new(-1.0, 0.0, -1.0), 0.5, Box::new(Dielectric::new(1.5)))));
 
 	// File content
 	for j in (0..ny).rev() {

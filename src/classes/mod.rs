@@ -1,4 +1,5 @@
 pub mod camera;
+pub mod dielectric;
 pub mod ray;
 pub mod vec3;
 pub mod hitRecord;
@@ -6,5 +7,6 @@ pub mod hitable;
 pub mod hitableList;
 pub mod lambertian;
 pub mod material;
+pub mod materialFn;
 pub mod metal;
 pub mod sphere;
