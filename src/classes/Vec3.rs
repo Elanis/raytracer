@@ -1,4 +1,3 @@
-use super::ray::Ray;
 use std::ops::{Add, Mul, Neg, Sub};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
