@@ -4,4 +4,7 @@ pub mod vec3;
 pub mod hitRecord;
 pub mod hitable;
 pub mod hitableList;
+pub mod lambertian;
+pub mod material;
+pub mod metal;
 pub mod sphere;

@@ -27,9 +27,7 @@ impl Hitable for HitableList {
 				hit_anything = true;
 				closest_so_far = temp_record.t;
 
-				rec.t = temp_record.t;
-				rec.p = temp_record.p;
-				rec.normal = temp_record.normal;
+				*rec = temp_record;
 			}
 		}
 

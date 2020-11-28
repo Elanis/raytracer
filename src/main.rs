@@ -6,6 +6,8 @@ use classes::camera::Camera;
 use classes::hitable::Hitable;
 use classes::hitableList::HitableList;
 use classes::hitRecord::HitRecord;
+use classes::lambertian::Lambertian;
+use classes::metal::Metal;
 use classes::ray::Ray;
 use classes::sphere::Sphere;
 use classes::vec3::Vec3;
@@ -14,27 +16,21 @@ use std::fs::File;
 
 use rand::Rng;
 
-fn random_in_unit_sphere() -> Vec3 {
-	let mut p;
-	let mut rng = rand::thread_rng();
-
-	loop {
-		p = Vec3::new(rng.gen_range(-1.0, 1.0), rng.gen_range(-1.0, 1.0), rng.gen_range(-1.0, 1.0));
-
-		if p.squared_length() < 1.0 {
-			break;
-		}
-	}
-
-	p
-}
-
-fn color_from_ray(r: &Ray, world: Box<&dyn Hitable>) -> Vec3 {
+fn color_from_ray(r: &Ray, world: Box<&dyn Hitable>, depth: u32) -> Vec3 {
 	let mut rec = HitRecord::new();
 	if world.hit(r, 0.001, std::f32::MAX, &mut rec) {
-		let target = rec.p + rec.normal + random_in_unit_sphere();
+		let mut scattered = Ray::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0));
+		let mut attenuation = Vec3::new(0.0, 0.0, 0.0);
 
-		return 0.5 * color_from_ray(&Ray::new(rec.p, target - &rec.p), world);
+		let material = &rec.material;
+
+		if depth < 50 && material.scatter(r, &rec, &mut attenuation, &mut scattered) {
+			let color = color_from_ray(&scattered, world, depth + 1);
+
+			return Vec3::new(color.x * attenuation.x, color.y * attenuation.y, color.z * attenuation.z);
+		}
+
+		return Vec3::new(0.0, 0.0, 0.0);
 	}
 
 	let unit_direction = r.direction();
@@ -59,8 +55,10 @@ fn main() -> std::io::Result<()> {
 	let camera = Camera::new();
 
 	let mut word = HitableList::new();
-	word.push(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)));
-	word.push(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
+	word.push(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5, Box::new(Lambertian::new(Vec3::new(0.8, 0.3, 0.3))))));
+	word.push(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0))))));
+	word.push(Box::new(Sphere::new(Vec3::new(1.0, 0.0, -1.0), 0.5, Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.3)))));
+	word.push(Box::new(Sphere::new(Vec3::new(-1.0, 0.0, -1.0), 0.5, Box::new(Metal::new(Vec3::new(0.8, 0.8, 0.8), 1.0)))));
 
 	// File content
 	for j in (0..ny).rev() {
@@ -72,7 +70,7 @@ fn main() -> std::io::Result<()> {
 				let v = (j as f32 + rng.gen_range(0.0, 1.0))  / ny as f32;
 
 				let r = camera.get_ray(u, v);
-				let col = color_from_ray(&r, Box::new(&word));
+				let col = color_from_ray(&r, Box::new(&word), 0);
 
 				color = color + col;
 			}
