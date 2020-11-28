@@ -2,6 +2,7 @@ mod classes;
 
 use std::io::Write;
 
+use classes::camera::Camera;
 use classes::hitable::Hitable;
 use classes::hitableList::HitableList;
 use classes::hitRecord::HitRecord;
@@ -34,10 +35,7 @@ fn main() -> std::io::Result<()> {
 	file.write(b"255\n")?;
 
 	// Preparate variables
-	let lower_left_corner = Vec3::new(-2.0, -1.0, -1.0);
-	let horizontal        = Vec3::new( 4.0,  0.0,  0.0);
-	let vertical          = Vec3::new( 0.0,  2.0,  0.0);
-	let origin            = Vec3::new( 0.0,  0.0,  0.0);
+	let camera = Camera::new();
 
 	let mut word = HitableList::new();
 	word.push(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)));
@@ -49,7 +47,7 @@ fn main() -> std::io::Result<()> {
 			let u = i as f32 / nx as f32;
 			let v = j as f32 / ny as f32;
 
-			let r = Ray::new(origin, lower_left_corner + u*horizontal + v*vertical);
+			let r = camera.get_ray(u, v);
 			let col = color_from_ray(&r, Box::new(&word));
 
 			let ir = (255.0*col.x).round();
