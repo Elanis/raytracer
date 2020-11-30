@@ -34,7 +34,8 @@ fn color_from_ray(r: &Ray, world: Box<&dyn Hitable>, depth: u32) -> Vec3 {
 		return Vec3::new(0.0, 0.0, 0.0);
 	}
 
-	let unit_direction = r.direction();
+	let mut unit_direction = Vec3::new(r.direction().x, r.direction().y, r.direction().z);
+	unit_direction.normalize();
 	let t = 0.5 * (unit_direction.y + 1.0);
 
 	(1.0 -t)*Vec3::new(1.0, 1.0, 1.0) + t*Vec3::new(0.5, 0.7, 1.0)
@@ -60,6 +61,7 @@ fn main() -> std::io::Result<()> {
 	word.push(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0))))));
 	word.push(Box::new(Sphere::new(Vec3::new(1.0, 0.0, -1.0), 0.5, Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.3)))));
 	word.push(Box::new(Sphere::new(Vec3::new(-1.0, 0.0, -1.0), 0.5, Box::new(Dielectric::new(1.5)))));
+	word.push(Box::new(Sphere::new(Vec3::new(-1.0, 0.0, -1.0), -0.45, Box::new(Dielectric::new(1.5)))));
 
 	// File content
 	for j in (0..ny).rev() {

@@ -20,7 +20,10 @@ impl Metal {
 
 impl Material for Metal {
 	fn scatter(&self, r: &Ray, rec: &HitRecord, attenuation: &mut Vec3, scattered: &mut Ray) -> bool {
-		let reflected = MaterialFn::reflect(r.direction(), rec.normal);
+		let mut rdirnorm = Vec3::new(r.direction().x, r.direction().y, r.direction().z);
+		rdirnorm.normalize();
+
+		let reflected = MaterialFn::reflect(rdirnorm, rec.normal);
 
 		let random = Sphere::random_in_unit_sphere();
 
