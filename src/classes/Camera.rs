@@ -10,7 +10,7 @@ pub struct Camera {
 
 impl Camera {
 	pub fn new(lookfrom: Vec3, lookat: Vec3, vup: Vec3, vfov: f32, aspect: f32) -> Camera {
-		let theta = vfov * std::f32::consts::PI / 180.0;
+		let theta = vfov.to_radians();
 		let half_height = (theta / 2.0).tan();
 		let half_width = aspect * half_height;
 
@@ -30,7 +30,7 @@ impl Camera {
 		}
 	}
 
-	pub fn get_ray(&self, u: f32, v: f32) -> Ray {
-		Ray::new(self.origin, self.lower_left_corner + u*self.horizontal + v*self.vertical - &self.origin)
-	}
+    pub fn get_ray(&self, u: f32, v: f32) -> Ray {
+        Ray::new(self.origin, self.lower_left_corner + u*self.horizontal + v*self.vertical - &self.origin)
+    }
 }

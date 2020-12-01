@@ -59,7 +59,7 @@ fn main() -> std::io::Result<()> {
 		Vec3::new(0.0, 0.0, -1.0),
 		Vec3::new(0.0, -1.0, 0.0),
 		90.0,
-		nx as f32 / ny as f32
+		ny as f32 / nx as f32
 	);
 
 	let mut word = HitableList::new();
