@@ -54,17 +54,20 @@ fn main() -> std::io::Result<()> {
 
 	// Preparate variables
 	let mut rng = rand::thread_rng();
-	let camera = Camera::new(90.0, nx as f32 / ny as f32);
+	let camera = Camera::new(
+		Vec3::new(-2.0, 2.0, 1.0),
+		Vec3::new(0.0, 0.0, -1.0),
+		Vec3::new(0.0, -1.0, 0.0),
+		90.0,
+		nx as f32 / ny as f32
+	);
 
-	let r = (std::f32::consts::PI / 4.0).cos();
 	let mut word = HitableList::new();
-	/*word.push(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5, Box::new(Lambertian::new(Vec3::new(0.1, 0.2, 0.5))))));
+	word.push(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5, Box::new(Lambertian::new(Vec3::new(0.1, 0.2, 0.5))))));
 	word.push(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0))))));
 	word.push(Box::new(Sphere::new(Vec3::new(1.0, 0.0, -1.0), 0.5, Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.3)))));
 	word.push(Box::new(Sphere::new(Vec3::new(-1.0, 0.0, -1.0), 0.5, Box::new(Dielectric::new(1.5)))));
-	word.push(Box::new(Sphere::new(Vec3::new(-1.0, 0.0, -1.0), -0.45, Box::new(Dielectric::new(1.5)))));*/
-	word.push(Box::new(Sphere::new(Vec3::new(-r, 0.0, -1.0), r, Box::new(Lambertian::new(Vec3::new(0.0, 0.0, 1.0))))));
-	word.push(Box::new(Sphere::new(Vec3::new( r, 0.0, -1.0), r, Box::new(Lambertian::new(Vec3::new(1.0, 0.0, 0.0))))));
+	word.push(Box::new(Sphere::new(Vec3::new(-1.0, 0.0, -1.0), -0.45, Box::new(Dielectric::new(1.5)))));
 
 	// File content
 	for j in (0..ny).rev() {
