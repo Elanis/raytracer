@@ -2,8 +2,13 @@ kind: pipeline
 name: main
 
 steps:
+- name: clippy
+  image: rust:latest
+  commands:
+   - cargo clippy --message-format=json &> clippy.report
+
 - name: sonarqube
-  image: dysnomiastudio/drone-sonar-plugin-rust
+  image: aosapps/drone-sonar-plugin
   settings:
     sonar_host: 
       from_secret: SONAR_HOST
