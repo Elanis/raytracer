@@ -1,0 +1,11 @@
+kind: pipeline
+name: main
+
+steps:
+- name: sonarqube
+  image: dysnomiastudio/drone-sonar-plugin-rust
+  settings:
+    sonar_host: 
+      from_secret: SONAR_HOST
+    sonar_token: 
+      from_secret: SONAR_TOKEN
